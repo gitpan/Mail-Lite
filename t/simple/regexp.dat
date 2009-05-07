@@ -1,0 +1,31 @@
+---
+-
+  - id: regexp
+    last: 1
+    match:
+      - from: support@yanes.ru
+      - to: support@reg.ru
+      - subj:
+          OR:
+            - preved
+            -
+              - musicians
+              - hashes
+      - body:
+          - HERE
+          - NOT:
+              NOT:
+                NOT:
+                  NOT: HERE
+    processors:
+      - processor: regexp
+        regexps:
+          byethere=~body: you are unlucky:(.*)
+          hithere=~body: you are lucky:(.*)
+          'test2=~second,once': (.*)
+          'test=~first,once': (.*)
+  -
+    - byethere: ' TEEEST'
+      hithere: ' HITHERE!'
+      test: preved
+      test2: medved

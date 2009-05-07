@@ -1,0 +1,297 @@
+Index: lib/Mail/Lite/Processors/Filter.pm
+===================================================================
+--- lib/Mail/Lite/Processors/Filter.pm	(revision 394)
++++ lib/Mail/Lite/Processors/Filter.pm	(working copy)
+@@ -11,12 +11,12 @@
+ sub process {
+     my $args_ref = shift;
+     
+-    my $params		= $args_ref->{params	};
++    my $message		= $args_ref->{input	};
+     my $processor_args	= $args_ref->{processor	};
+ 
+-    @$params == 1 or die "incorrect parameters for filter";
++    #@$input == 1 or die "incorrect parameters for filter";
+ 
+-    my $message = $params->[0];
++    #my $message = $params->[0];
+ 
+     eval { $message->can('body') } or die "incorrect message";
+ 
+@@ -33,7 +33,8 @@
+ 
+     $message->{body} = $mbody;
+ 
+-    @$params = $message;
++    ${ $args_ref->{ output } } = $message;
++
+     return OK;
+ }
+ 
+Index: lib/Mail/Lite/Processors/Regexp.pm
+===================================================================
+--- lib/Mail/Lite/Processors/Regexp.pm	(revision 394)
++++ lib/Mail/Lite/Processors/Regexp.pm	(working copy)
+@@ -33,9 +33,8 @@
+ sub process {
+     my $args_ref = shift;
+     
+-    my $params	    = $args_ref->{params};
+-    my $message    = $params->[0];
+-    my $processor_args = $args_ref->{processor};
++    my $message		= $args_ref->{input	};
++    my $processor_args	= $args_ref->{processor	};
+ 
+     my $extracted = {};
+ 
+@@ -104,7 +103,7 @@
+ 	}
+     }
+ 
+-    @$params = $extracted;
++    ${ $args_ref->{ output } } = [ $extracted ];
+ 
+     return OK;
+ }
+Index: lib/Mail/Lite/Processors/Match.pm
+===================================================================
+--- lib/Mail/Lite/Processors/Match.pm	(revision 395)
++++ lib/Mail/Lite/Processors/Match.pm	(working copy)
+@@ -77,25 +77,26 @@
+     my $message = shift;
+ 
+ 
+-    my $matched = $message->{matched} ||= {};
++#    my $matched = $message->{matched} ||= {};
+ 
+     #keys %$rules;
+     foreach my $k (keys %$rules) {
+ 	#while (my ($k, $v) = each %$rules) {
+ 	my $v = $rules->{$k};
+ 
+-	my $rule_hash = _get_hash( $k, $v );
+-	if ( exists $matched->{ $rule_hash } ){
+-	    next if $matched->{ $rule_hash };
+-	    #keys %$rules;
+-	    return;
+-	} 
+-	else {
++#	my $rule_hash = _get_hash( $k, $v );
++#	if ( exists $matched->{ $rule_hash } ){
++#	    next if $matched->{ $rule_hash };
++#	    #keys %$rules;
++#	    return;
++#	} 
++#	else 
++	{
+ 	    my $result = _recurse_conditions( \&_match_rule, $v, 
+ 		[ $message, $k ]
+ 	    );
+ 
+-	    $matched->{ $rule_hash } = $result;
++#	    $matched->{ $rule_hash } = $result;
+ 
+ 	    return unless $result;
+ 	}
+@@ -273,10 +274,8 @@
+ 
+ # Сопоставить сообщение с правилом
+ sub match {
+-    my ( $me, $processor, $params ) = @_;
++    my ( $me, $processor, $message ) = @_;
+ 
+-    my $message = $params->[0];
+-
+     if ( not ref $message ) {
+ 	die "Message is not ref: $message";
+     }
+@@ -295,13 +294,11 @@
+ sub process {
+     my $args_ref = shift;
+ 
+-    my ( $processor, $params ) = @$args_ref{ qw/processor params/ };
++    my ( $processor, $message ) = @$args_ref{ qw/processor input/ };
+ 
+-    @$params == 1 or die "incorrect parameters for match";
+-
+     #Mail::Lite::Processors::Match->require;
+ 
+-    return __PACKAGE__->match( $processor, $params );
++    return __PACKAGE__->match( $processor, $message );
+ }
+ 
+ 1;
+Index: lib/Mail/Lite/Processors/ParseRfc822.pm
+===================================================================
+--- lib/Mail/Lite/Processors/ParseRfc822.pm	(revision 394)
++++ lib/Mail/Lite/Processors/ParseRfc822.pm	(working copy)
+@@ -10,10 +10,8 @@
+ 
+ sub process {
+     my $args_ref = shift;
+-    my ( $processor, $params ) = @$args_ref{ qw/processor params/ };
++    my ( $processor, $message ) = @$args_ref{ qw/processor input/ };
+ 
+-    my $message = $params->[0];
+-
+     my @lines = split /\n\s*/, $message->body;
+ 
+     my $parsed = {};
+@@ -37,10 +35,11 @@
+                 $parsed->{$key} = [ $parsed->{$key}, $val ];
+             }
+         }
+-   }
++    }
+ 
+-    @$params = $parsed;
+ 
++    ${ $args_ref->{ output } } = [ $parsed ];
++
+     return OK;
+ }
+ 
+Index: lib/Mail/Lite/Processors/Chain.pm
+===================================================================
+--- lib/Mail/Lite/Processors/Chain.pm	(revision 394)
++++ lib/Mail/Lite/Processors/Chain.pm	(working copy)
+@@ -6,12 +6,13 @@
+ use Mail::Lite::Constants;
+ use Smart::Comments -ENV;
+ 
++use Data::Dumper;
+ 
+ 
+ sub process {
+     my $args_ref = shift;
+ 
+-    my $params_ref	= $args_ref->{params	};
++    my $input_ref	= $args_ref->{input	};
+     my $rule_ref	= $args_ref->{rule	};
+     my $all_rules	= $args_ref->{rules	};
+ 
+@@ -33,13 +34,18 @@
+ 
+     #warn Dumper($processor_obj);
+ 
+-    foreach my $param (@$params_ref) {
++    my @output;
++
++    ref $input_ref eq 'ARRAY'
++	or $input_ref = [ $input_ref ];
++
++    foreach my $message (@$input_ref) {
+ 	my $handler_sub = sub { 
+ 	    #warn Dumper \@_;
+ 	    my $rule	= shift;
+ 	    my $result	= shift->[0];
+ 
+-	    $param = {
++	    my $param = {
+ 		rule_id   => $rule->{id}
+ 	    };
+ 
+@@ -49,14 +55,18 @@
+ 	    else {
+ 		$param->{result} = $result;
+ 	    }
++
++	    push @output, $param;
+ 	};
+ 
+ 	$processor_obj->process(
+-	    message => $param,
++	    message => $message,
+ 	    handler => $handler_sub,
+ 	);
+     }
+ 
++    ${ $args_ref->{ output } } = \@output;
++
+     return ! exists $rule_ref->{last} || $rule_ref->{last} ? STOP_RULE : OK;
+ }
+ 
+Index: lib/Mail/Lite/Processors/SplitMsg.pm
+===================================================================
+--- lib/Mail/Lite/Processors/SplitMsg.pm	(revision 394)
++++ lib/Mail/Lite/Processors/SplitMsg.pm	(working copy)
+@@ -17,11 +17,8 @@
+ 	die "not found separator for split";
+     }
+ 
+-    my $params	= $args_ref->{params};
+-    @$params == 1 or die "incorrect parameters for split";
++    my $message	= $args_ref->{input};
+ 
+-    my $message = $params->[0];
+-
+     if ( not eval { $message->can('body') } ) { 
+ 	die "first param for split MUST be an message";
+     }
+@@ -55,7 +52,7 @@
+ 	push @new_messages, $new_message;
+     }
+ 
+-    @$params = @new_messages;
++    ${ $args_ref->{ output } } = \@new_messages;
+ 
+     ## $params
+ 
+Index: lib/Mail/Lite/Processor.pm
+===================================================================
+--- lib/Mail/Lite/Processor.pm	(revision 395)
++++ lib/Mail/Lite/Processor.pm	(working copy)
+@@ -95,18 +95,22 @@
+ 	    match_rules => $rule->{match}
+ 	};
+ 
+-	my $params = [ clone( $message ) ];
++	my $input = $message;
++	my $output;
+ 
+ 	PROCESSOR:
+ 	foreach my $processor ($match_processor, @$processors) {
+ 
++	    $input  = defined $output ? $output : $input;
++
+ 	    my $processor_sub = 
+ 		    _get_processor_method( $processor->{processor} );
+ 
+ 	    my $result = $processor_sub->(
+ 		{
+ 		    processor	=> $processor	 ,
+-		    params	=> $params	 ,
++		    input	=> $input	 ,
++		    output	=> \$output	 ,
+ 		    rule	=> $rule	 ,
+ 		    rules	=> $self->{rules},
+ 		}
+@@ -122,16 +126,17 @@
+ 		next RULE;
+ 	    }
+ 	    elsif ( STOP_RULE eq $result ) {
+-		$handler->( $rule, $params );
++		$handler->( $rule, $output );
+ 		last RULE;
+ 	    }
+ 	    elsif ( ERROR eq $result ) {
+ 		die "ERROR in $rule->{id}'s $processor->{processor}";
+ 	    }
++
+ 	}
+ 
+ 	# ok, call handler
+-	$handler->( $rule, $params );
++	$handler->( $rule, $output );
+     }
+ }
+ 
+@@ -153,7 +158,7 @@
+ 	$pkgname = 'Mail::Lite::Processors::'.$pkgname;
+ 
+ 	if ( not $pkgname->require ) {
+-	    die "cannot find processors $processor";
++	    die "cannot find processors $processor: $@";
+ 	}
+ 	        
+ 	my $c = $pkgname->can('process')

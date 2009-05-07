@@ -1,0 +1,61 @@
+---
+-
+  - id: rusu.response.delete
+    match:
+      - from:
+          OR:
+            - nobody@ripn.net
+            - nobody@registry.su
+      - OR:
+          - x_filename: ANS
+          - NOT:
+              x_filename: ~
+      - body:
+          - Dear Colleague
+          - action:\s*DELETE
+    processors:
+      - filters:
+          -
+            - '(?s)> #\[TEMPLATES END\]#.*'
+            - "> #[TEMPLATES END]#\n"
+        processor: filter
+      - begin: '(?s)action:\s*DELETE[^#]*#\[DOMAIN TEMPLATE\]#'
+        emulate: 0
+        end: '> #\[TEMPLATES END\]#'
+        processor: split_msg
+        separator: '> #\[DOMAIN TEMPLATE\]#'
+      - processor: chain
+    weight: 5
+  -
+    - domain: air.ru
+      error_code:
+        - 'Authentication failed. - FATAL ERROR !'
+        - Access to object is denied!
+      req_id: 20080724154503.851180
+      rule_id: rusu.response.delete.fail
+    - domain: upanishadixxx.ru
+      error_code: "Object 'UPANISHADIXXX.RU' not found - FATAL ERROR !"
+      req_id: 20080724154503.851180
+      rule_id: rusu.response.delete.fail
+    - domain: sex.ru
+      error_code:
+        - 'Authentication failed. - FATAL ERROR !'
+        - Access to object is denied!
+      req_id: 20080724154503.851180
+      rule_id: rusu.response.delete.fail
+    - domain: trax007.ru
+      error_code:
+        - 'Authentication failed. - FATAL ERROR !'
+        - Access to object is denied!
+      req_id: 20080724154503.851180
+      rule_id: rusu.response.delete.fail
+    - domain: don22200.ru
+      error_code: "Object 'DON22200.RU' not found - FATAL ERROR !"
+      req_id: 20080724154503.851180
+      rule_id: rusu.response.delete.fail
+    - domain: xn--sex170004536_74323-.ru
+      error_code:
+        - 'Invalid domain name - FATAL ERROR !'
+        - "Domain name contains forbidden character. Must be just letters, digits or `-'. "
+      req_id: 20080724154503.851180
+      rule_id: rusu.response.delete.fail

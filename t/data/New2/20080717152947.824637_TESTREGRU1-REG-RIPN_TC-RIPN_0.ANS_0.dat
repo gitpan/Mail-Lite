@@ -1,0 +1,52 @@
+---
+-
+  - id: rusu.response.new
+    match:
+      - from:
+          OR:
+            - nobody@ripn.net
+            - nobody@registry.su
+      - OR:
+          - x_filename: ANS
+          - NOT:
+              x_filename: ~
+      - body:
+          - Dear Colleague
+          - (?i)action:\s*NEW
+    processors:
+      - filters:
+          -
+            - '(?s)> #\[TEMPLATES END\]#.*'
+            - "> #[TEMPLATES END]#\n"
+        processor: filter
+      - begin: '(?si)action:\s*NEW[^#]*#\[DOMAIN TEMPLATE\]#'
+        emulate: 0
+        end: '> #\[TEMPLATES END\]#'
+        processor: split_msg
+        separator: '> #\[DOMAIN TEMPLATE\]#'
+      - processor: chain
+    weight: 2
+  -
+    - domain: air.ru
+      error_code: "Object 'AIR.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080717152945.254883
+      rule_id: rusu.response.new.fail
+    - domain: sex.ru
+      error_code: "Object 'SEX.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080717152945.254883
+      rule_id: rusu.response.new.fail
+    - domain: sex17000453674323.ru
+      req_id: 20080717152945.254883
+      rule_id: rusu.response.new.ok
+    - domain: trax007.ru
+      req_id: 20080717152945.254883
+      rule_id: rusu.response.new.ok
+    - domain: don22200.ru
+      req_id: 20080717152945.254883
+      rule_id: rusu.response.new.ok
+    - domain: xn--upanishadi_xxx-.ru
+      error_code:
+        - 'Invalid domain name - FATAL ERROR !'
+        - "Domain name contains forbidden character. Must be just letters, digits or `-'. "
+      req_id: 20080717152945.254883
+      rule_id: rusu.response.new.fail

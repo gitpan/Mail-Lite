@@ -1,0 +1,31 @@
+---
+-
+  - id: music
+    last: 1
+    match:
+      - from: support@yanes.su
+      - to: support@reg.ru
+      - subj: '^Sometestmessage about musicians'
+    processors:
+      - begin: "#\\[MESSAGE FOLLOWS\\]\n\n"
+        emulate: 0
+        end: "#\\[END OF MESSAGES\\]\n"
+        processor: split_msg
+        separator: "#\\[ANOTHER MESSAGE FOLLOWS\\]\n\n"
+      - processor: chain
+    weight: 0
+  -
+    - 2beor!2be: whats question!
+      hiparticipateus: or die
+      rule_id: music.sub
+    - pink_floyd:
+        - dark side of the moon
+        - comfortably numb
+        - money
+      remember_when_you_were_young:
+        - you should like this song
+        - shine on you crazy diamond
+      rule_id: music.sub
+      there_is_no_catch_of_life: slipknot
+    - nirvana: Come as you are.
+      rule_id: music.sub
