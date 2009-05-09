@@ -1,19 +1,6 @@
 ---
 -
-  - id: rfc822
-    last: 1
-    match:
-      - from: support@registry.su
-      - to: support@reg.ru
-      - subj: '^Sometestmessage$'
-    processors:
-      - begin: "#\\[START OF MESSAGE\\]\n"
-        emulate: 0
-        end: "#\\[END OF MESSAGE]\n"
-        processor: split_msg
-        separator: "#\\[START OF MESSAGE\\]\n"
-      - processor: parse_rfc822
-    weight: 0
+  - rfc822
   -
     - how_are_you: fine
       who_are_you: man

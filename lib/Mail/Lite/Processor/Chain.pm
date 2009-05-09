@@ -42,11 +42,11 @@ sub process {
     foreach my $message (@$input_ref) {
 	my $handler_sub = sub { 
 	    ### @_ 
-	    my $rule	= shift;
+	    my $rule_id	= shift;
 	    my $result	= shift->[0];
 
 	    my $param = {
-		rule_id   => $rule->{id}
+		rule_id   => $rule_id,
 	    };
 
 	    if ( ref $result eq 'HASH' ) {

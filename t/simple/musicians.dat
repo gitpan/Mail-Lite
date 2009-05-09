@@ -1,19 +1,6 @@
 ---
 -
-  - id: music
-    last: 1
-    match:
-      - from: support@yanes.su
-      - to: support@reg.ru
-      - subj: '^Sometestmessage about musicians'
-    processors:
-      - begin: "#\\[MESSAGE FOLLOWS\\]\n\n"
-        emulate: 0
-        end: "#\\[END OF MESSAGES\\]\n"
-        processor: split_msg
-        separator: "#\\[ANOTHER MESSAGE FOLLOWS\\]\n\n"
-      - processor: chain
-    weight: 0
+  - music
   -
     - 2beor!2be: whats question!
       hiparticipateus: or die

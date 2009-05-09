@@ -195,11 +195,6 @@ sub _recurse_conditions {
     return $handler->( $rule, $data );
 }
 
-sub _get_hash {
-    my @a = @_;
-    return md5_hex( _dump( @a ) );
-}
-
 sub _check_with_custom_processor {
     my ($message, $rule) = @_;
     if ( not ref $rule->{matcher} eq 'CODE' ) {
@@ -355,5 +350,13 @@ sub process {
 
     return __PACKAGE__->match( $processor, $message );
 }
+
+=head1 
+
+=head2 SYNOPSIS
+
+* test
+
+=cut
 
 1;

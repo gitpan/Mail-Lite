@@ -1,12 +1,6 @@
 ---
 -
-  - id: ym.reestr
-    last: 1
-    match:
-      - from: cpp@paycash.ru
-      - subj: РЕЕСТР ПЛАТЕЖЕЙ В ООО \"Регистратор
-    processors:
-      - processor: stub
+  - ym.reestr
   - !!perl/hash:Mail::Lite::Message
     body: |+
       -----BEGIN PGP MESSAGE-----

@@ -193,7 +193,7 @@ sub _process_by_rule_chain {
 		next RULE;
 	    }
 	    elsif ( STOP_RULE eq $result ) {
-		$handler->( $rule, $output );
+		$handler->( $rule->{id}, $output );
 		last RULE;
 	    }
 	    elsif ( ERROR eq $result ) {
@@ -203,7 +203,7 @@ sub _process_by_rule_chain {
 	}
 
 	# ok, call handler
-	$handler->( $rule, $output );
+	$handler->( $rule->{id}, $output );
     }
 }
 

@@ -8,9 +8,11 @@ my $build = Module::Build->new(
     module_name         => 'Mail::Lite',
     requires            => {
         'perl'              => 5.006,
+	'UNIVERSAL::require'=> 0,
     },
     build_requires      => {
         'Test::More'        => 0,
+	'YAML::Syck'	    => 0,
     },
     create_makefile_pl  => 'traditional',
     dist_abstract       => 'Mail::Lite -- Lite modules for mail messages parsing etc',

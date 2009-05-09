@@ -1,17 +1,6 @@
 ---
 -
-  - id: rusu.notify
-    last: 1
-    match:
-      - from: nobody@(?:ripn.net|registry.su)
-      - OR:
-          - x_filename: NFY.*UPDATED
-          - NOT:
-              x_filename: ~
-      - subject: 'Notification of (FID|RIPN) [dD]atabase changes?'
-    processors:
-      - processor: chain
-    weight: 0
+  - rusu.notify
   -
     - domain: UPANISHADIXXX.RU
       rule_id: rusu.notify.deleted
