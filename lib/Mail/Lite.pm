@@ -16,6 +16,6 @@ package Mail::Lite;
 use strict;
 use warnings;
 
-our $VERSION = '0.1003';
+our $VERSION = '0.1004';
 
 1;

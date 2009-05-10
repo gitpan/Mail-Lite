@@ -23,7 +23,6 @@ use Test::More tests => 4;                      # last test to print
 
 use Data::Dumper;
 use YAML::Syck;
-use YAML;
 
 use Mail::Lite::Processor;
 

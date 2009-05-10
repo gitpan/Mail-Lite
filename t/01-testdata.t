@@ -23,7 +23,6 @@ use Test::More tests => 71;
 
 use Data::Dumper;
 use YAML::Syck;
-use YAML;
 
 use Mail::Lite::Processor;
 
