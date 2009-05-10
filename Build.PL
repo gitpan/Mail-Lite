@@ -9,6 +9,7 @@ my $build = Module::Build->new(
     requires            => {
         'perl'              => 5.006,
 	'UNIVERSAL::require'=> 0,
+	'Smart::Comments'   => 0,
     },
     build_requires      => {
         'Test::More'        => 0,
