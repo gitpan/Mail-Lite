@@ -20,6 +20,7 @@ use warnings;
 
 use Test::More tests => 71;
 
+
 use Data::Dumper;
 use YAML::Syck;
 use YAML;
@@ -30,17 +31,24 @@ use File::Find;
 
 chdir('..') if -d 'data';
 
-my @messages;
-find(
-    sub { 
-	-f $_ && m/^\d/ && $File::Find::name !~ m/.svn/ && ! m/\.dat$/
-	    and push @messages, $File::Find::name
-    },
-    't/data');
+my @messages = @ARGV;
+
+if ( not @messages ) {
+    find(
+	sub { 
+	    -f $_ && m/^\d/ && $File::Find::name !~ m/.svn/ && ! m/\.dat$/
+		and push @messages, $File::Find::name
+	},
+	't/data');
+}
 
 my ($rules) = LoadFile('t/data/rules.yaml');
 
+#die Dumper $rules;
+
 foreach my $message_fn (@messages) {
+    my $dat_fn = $message_fn.q{.dat};
+    
     my $message = slurp_file( $message_fn );
 
     $message = koi2win( $message );
@@ -56,7 +64,12 @@ foreach my $message_fn (@messages) {
 	handler => sub { push @$matched_rules, [ @_ ] },
     ); 
 
-    is_deeply( $matched_rules, LoadFile( $message_fn.q{.dat} ), $message_fn );
+    if ( $ENV{OVERWRITE_DATA} ) {
+	open my $fh, '>', $dat_fn;
+	print $fh Dump( $matched_rules );
+	close $fh;
+    }
+    is_deeply( $matched_rules, LoadFile( $dat_fn ), $message_fn );
 }
 
 sub slurp_file {

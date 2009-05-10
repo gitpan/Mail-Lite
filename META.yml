@@ -1,6 +1,6 @@
 ---
 name: Mail-Lite
-version: 0.1001
+version: 0.1002
 author: []
 abstract: 'Mail::Lite -- Lite modules for mail messages parsing etc'
 license: perl
@@ -15,7 +15,7 @@ build_requires:
 provides:
   Mail::Lite:
     file: lib/Mail/Lite.pm
-    version: 0.1001
+    version: 0.1002
   Mail::Lite::Constants:
     file: lib/Mail/Lite/Constants.pm
   Mail::Lite::Mbox:
@@ -40,7 +40,7 @@ provides:
     file: lib/Mail/Lite/Processor/SplitMsg.pm
   Mail::Lite::Processor::Stub:
     file: lib/Mail/Lite/Processor/Stub.pm
-generated_by: Module::Build version 0.3
+generated_by: Module::Build version 0.280801
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
   version: 1.2

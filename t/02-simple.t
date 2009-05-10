@@ -60,6 +60,11 @@ foreach my $message_fn (@messages) {
 	handler => sub { push @$matched_rules, [ @_ ] },
     ); 
 
+    if ( $ENV{OVERWRITE_DATA} ) {
+	open my $fh, '>', $dat_fn;
+	print $fh Dump( $matched_rules );
+	close $fh;
+    }
     is_deeply( $matched_rules, LoadFile( $dat_fn ), $message_fn );
 }
 

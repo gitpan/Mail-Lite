@@ -313,10 +313,7 @@ sub _match_text {
 #	return $text eq $rule;
 #    }
 
-    $rule = $rules->{$rule} ||= do {
-	#$rule = substr( $rule, 3, -1 );
-	qr/$rule/;
-    };
+    $rule = $rules->{$rule} ||= qr/$rule/;
 
     #warn "Don't matches";
     return $text =~ $rule;
