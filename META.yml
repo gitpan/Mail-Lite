@@ -1,12 +1,14 @@
 ---
 name: Mail-Lite
-version: 0.1004
+version: 0.1005
 author: []
 abstract: 'Mail::Lite -- Lite modules for mail messages parsing etc'
 license: perl
 resources:
   license: http://dev.perl.org/licenses/
 requires:
+  Clone: 0
+  MIME::Words: 0
   Smart::Comments: 0
   UNIVERSAL::require: 0
   perl: 5.006
@@ -16,7 +18,7 @@ build_requires:
 provides:
   Mail::Lite:
     file: lib/Mail/Lite.pm
-    version: 0.1004
+    version: 0.1005
   Mail::Lite::Constants:
     file: lib/Mail/Lite/Constants.pm
   Mail::Lite::Mbox:

@@ -6,6 +6,8 @@ WriteMakefile
           'NAME' => 'Mail::Lite',
           'VERSION_FROM' => 'lib/Mail/Lite.pm',
           'PREREQ_PM' => {
+                           'Clone' => 0,
+                           'MIME::Words' => 0,
                            'Smart::Comments' => 0,
                            'Test::More' => 0,
                            'UNIVERSAL::require' => 0,
